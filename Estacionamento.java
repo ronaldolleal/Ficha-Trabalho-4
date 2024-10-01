@@ -11,7 +11,7 @@ public class Estacionamento {
     }
 
     private static final int lotacao_maxima = 500;
-    private static final double tarifa = 0.10; // Valor a pagar por 15 minutos 
+    private static final double tarifa = 0.10; // Valor a pagar por 15 minutos
     private List<Aluno> alunos;
     private int lugaresOcupados;
 
@@ -29,17 +29,15 @@ public class Estacionamento {
 
         while (true) {
 
+            System.out.println("\n");
+
             System.out.println("1. Entrar no estacionamento");
-
             System.out.println("2. Sair do estacionamento");
-
             System.out.println("3. Sair");
-
             System.out.print("Escolha uma opção: ");
 
             int escolha = scanner.nextInt();
-
-            scanner.nextLine(); // Limpa o buffer 
+            scanner.nextLine(); // Limpa o buffer
 
             switch (escolha) {
 
@@ -73,33 +71,37 @@ public class Estacionamento {
 
     }
 
+    /**
+     * Method to enter the parking.
+     * 
+     * this method is used to enter the parking.
+     * 
+     * @param scanner Scanner object used to read user input.
+     */
     private void entrarEstacionamento(Scanner scanner) {
 
         if (lugaresOcupados < lotacao_maxima) {
 
-            System.out.print("Digite o seu nome: ");
-
+            System.out.print("\nDigite o seu nome: ");
             String nome = scanner.nextLine();
 
             System.out.print("Digite a matrícula do carro: ");
-
             String matricula = scanner.nextLine();
 
             System.out.print("Digite o tempo de estacionamento em minutos: ");
-
             int tempo = scanner.nextInt();
 
-            scanner.nextLine(); // Limpa o buffer 
+            scanner.nextLine(); // Limpa o buffer
 
             double valorAPagar = calcularValor(tempo);
-
             System.out.println("Valor a pagar: €" + valorAPagar);
 
             alunos.add(new Aluno(nome, matricula, tempo, valorAPagar));
 
             lugaresOcupados++;
 
-            salvarEstacionamento(nome, matricula, tempo, valorAPagar);
+            // nao percebi porque
+            // salvarEstacionamento(nome, matricula, tempo, valorAPagar);
 
         } else {
 
@@ -109,40 +111,68 @@ public class Estacionamento {
 
     }
 
+    /**
+     * Method to leave the parking.
+     * 
+     * This method is used to leave the parking. It asks for the car's license plate
+     * and checks if it is in the list of parked cars.
+     * 
+     * @param scanner Scanner object used to read user input.
+     */
     private void sairEstacionamento(Scanner scanner) {
 
-        System.out.print("Digite a matrícula do carro: ");
-
+        System.out.print("\nDigite a matrícula do carro: ");
         String matricula = scanner.nextLine();
 
-        boolean encontrado = false;
+        Aluno aluno = checkMatriculas(matricula);
+
+        if (aluno != null) {
+
+            System.out.println("Você saiu do estacionamento.");
+
+            alunos.remove(aluno);
+
+            lugaresOcupados--;
+
+        } else {
+
+            System.out.println("O veículo não está no parque.");
+        }
+
+    }
+
+    /**
+     * Checks if a car is parked in the parking lot.
+     * 
+     * This method takes a car's license plate as argument and checks if it is in
+     * the list of parked cars.
+     * 
+     * @param matricula The car's license plate to be checked.
+     * @return The Aluno object of the car if it is parked, null otherwise.
+     */
+    private Aluno checkMatriculas(String matricula) {
 
         for (Aluno aluno : alunos) {
 
             if (aluno.getMatricula().equals(matricula)) {
 
-                System.out.println("Você saiu do estacionamento.");
-
-                alunos.remove(aluno);
-
-                lugaresOcupados--;
-
-                encontrado = true;
-
-                break;
-
+                return aluno;
             }
-
         }
-
-        if (!encontrado) {
-
-            System.out.println("Matrícula não encontrada.");
-
-        }
-
+        return null;
     }
 
+    /**
+     * Method to calculate the price of a parking stay.
+     * 
+     * This method takes the time in minutes as an argument and returns the price of
+     * the parking stay.
+     * The price is calculated by rounding up the time to the nearest multiple of 15
+     * and multiplying it by the parking tariff.
+     * 
+     * @param minutos The time in minutes.
+     * @return The price of the parking stay.
+     */
     private double calcularValor(int minutos) {
 
         return Math.ceil(minutos / 15.0) * tarifa;
